@@ -45,6 +45,9 @@ button:hover {
 	-webkit-box-shadow: 0 0 10px #888;
 	box-shadow: 0 0 10px #888;
 }
+#register-link {
+	margin-left: 10px;
+}
 
 a {
   color: #00B7FF;

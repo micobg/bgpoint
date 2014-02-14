@@ -16,13 +16,17 @@ exports.login_submit = function(db) {
 		};
 
 		db.collection('users').find(query, {}).toArray(function (err, items) {
-			if (items.length) {
-				console.log(items);
-				res.redirect('map_index');
+			if (items.length) { // login successful
+				req.session.user_id = items[0]['_id']; // it's bad but times up
+ 				res.send({ redirect: 'index' });
 			} else {
-				console.log('sdsdsdsdssdsdssd');
-				res.json(false);
+				res.send(false);
 			}
 		});
 	};
 };
+
+exports.logout = function (req, res) {
+	delete req.session.user_id;
+	res.redirect('login');
+}

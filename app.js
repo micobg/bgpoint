@@ -42,11 +42,23 @@ if ('development' == app.get('env')) {
 }
 
 // GET
-app.get('/', routes.index);
+app.get('/', routes.root);
+app.get('/index', checkAuth, routes.index);
 // app.get('/users', user.list);
 app.get('/login', user.login);
+app.get('/logout', user.logout);
+
+// POST
 app.post('/login_submit', user.login_submit(db));
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+function checkAuth(req, res, next) {
+	if (!req.session.user_id) {
+		res.redirect('login');
+	} else {
+		next();
+	}
+}
