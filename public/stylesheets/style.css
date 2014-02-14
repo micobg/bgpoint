@@ -7,6 +7,9 @@ html, body, #map-canvas {
 h1 {
 	margin: 0;
 }
+fieldset {
+	border: 0;
+}
 input, button {
 	border: 1px solid #ccc;
 	padding: 5px;
