@@ -54,8 +54,11 @@ app.get('/objects', checkAuth, objects.fetch(db));
 app.post('/login_submit', user.login_submit(db));
 app.post('/objects', checkAuth, objects.create(db));
 
+// DELETE
+app.delete('/objects/:id', checkAuth, objects.delete(db));
+
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+	console.log('Express server listening on port ' + app.get('port'));
 });
 
 // other functions

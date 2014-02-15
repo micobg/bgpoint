@@ -7,7 +7,6 @@ $(window).resize(editTemplate());
 // events
 $('#btnLogin').on('click', loginSubmit);
 $('#menu-box #get-all-objects').on('click', fetchAllObjects);
-$('#create-object #create-object-submit').on('click', createObject);
 
 function editTemplate() {
     // login
@@ -47,7 +46,7 @@ function fetchAllObjects() {
                 // render data
                 $('body').append('<ul id="all-objects"></ul>');
                 data.objects.forEach(function (object) {
-                    $('#all-objects').append('<li><a href="">' + object.name + '</li>');
+                    $('#all-objects').append('<li>' + object.name + ' <span rel="' + object._id + '" id="delete-object-submit">х</span></li>');
                 });
 
                 if (data.next_page) {
@@ -57,6 +56,9 @@ function fetchAllObjects() {
                 // close it
                 $('#all-objects').remove();
             }
+
+            // bind event
+            $('#delete-object-submit').on('click', deleteObject);
         }
     });
 }
@@ -76,19 +78,20 @@ function renderCreateObjectForm(coordinates) {
     form.append('<input type="text" id="object-price" placeholder="Цена на билета">');
     form.append('<input type="text" id="object-additional-info" placeholder="Допълнителна информация (разделени със запетаи)">');
     form.append('<br /><button id="create-object-submit">Създай обекта</button>');
-}
+
+    // bind event
+    $('#create-object-submit').on('click', createObject);}
 
 function createObject() {
-    console.log('sd');
     var object = {
         name: $('#object-name').val(),
         coordinates: {
             latitude: $('#object-coordinates-latitude').val(),
             longitude: $('#object-coordinates-longitude').val()
         },
-        type: $('#object-type').val()
+        type: $('#object-type').val(),
+        rating: 0
     };
-    console.log(object);
 
     if ($('#object-bussines-hours-from').val() !== '' && $('#object-bussines-hours-to').val() !== '') {
         object.bussines_hours = [];
@@ -107,14 +110,43 @@ function createObject() {
         });
         object.additional_info = trimmed;
     }
-    console.log(object);
 
     $.ajax({
         type: 'POST',
         data: object,
         url: '/objects',
-        dataType: 'JSON'
-    }).done(function (response) {
-        alert('Обектът е създаден успешно!');
+        dataType: 'JSON',
+        success: function (response) {
+            $('#create-object').remove();
+            alert('Обектът е създаден успешно!');
+        }
     });
+}
+
+function deleteObject(event) {
+    var confirmation = confirm('Наистина ли искате да изтриете този обект?');
+console.log(event);
+    // Check and make sure the user confirmed
+    if (confirmation) {
+
+        // If they did, do our delete
+        $.ajax({
+            type: 'DELETE',
+            url: '/objects/' + $(event).attr('rel')
+        }).done(function (response) {
+
+          // Check for a successful (blank) response
+          if (response.msg === '') {
+          }
+          else {
+            alert('Error: ' + response.msg);
+          }
+
+          fetchAllObjects();
+        });
+
+    }
+    else {
+        return false;
+    }
 }

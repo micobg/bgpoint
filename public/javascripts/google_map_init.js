@@ -58,7 +58,7 @@ function renderTooltip(object) {
         a_info += '<div> - <em>' + object.additional_info.join(', ') + '</em></div>';
     }
 
-    return '<h2>' + object.name + ' <em>(рейтинг ' + object.rating + ')</em><h2>' +
+    return '<h2>' + object.name + ' <em>(' + object.rating + ')</em><h2>' +
         '<div>' + object.desc + '</div>' + 
         type + bussines_hours + price + a_info;
 }
