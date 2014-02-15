@@ -6,6 +6,7 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
+var objects = require('./routes/objects');
 var http = require('http');
 var path = require('path');
 // var _ = require('underscore');
@@ -47,14 +48,17 @@ app.get('/index', checkAuth, routes.index);
 // app.get('/users', user.list);
 app.get('/login', user.login);
 app.get('/logout', user.logout);
+app.get('/objects', checkAuth, objects.fetch(db));
 
 // POST
 app.post('/login_submit', user.login_submit(db));
+app.post('/objects', checkAuth, objects.create(db));
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+// other functions
 function checkAuth(req, res, next) {
 	if (!req.session.user_id) {
 		res.redirect('login');

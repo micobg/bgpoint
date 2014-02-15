@@ -1,5 +1,9 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+    #map-canvas
+    ul#menu-box.clrfix
+        li#get-all-objects
+            Всички обекти
+        li#Logout
+            a(href="/logout") Изход
