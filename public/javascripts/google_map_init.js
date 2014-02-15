@@ -20,7 +20,7 @@ function initialize() {
                 google.maps.event.addListener(marker, 'click', function() {
                     infowindow.open(map,marker);
                 });
-console.log(object);
+
                 marker.setMap(map);
             });
         }
@@ -58,7 +58,8 @@ function renderTooltip(object) {
         a_info += '<div> - <em>' + object.additional_info.join(', ') + '</em></div>';
     }
 
-    return '<h2>' + object.name + ' <em>(' + object.rating + ')</em><h2>' +
+    return '<h2>' + object.name + '</h2>' +
+        'Рейтинг: <em>(' + object.rating + ')</em>' + 
         '<div>' + object.desc + '</div>' + 
         type + bussines_hours + price + a_info;
 }
