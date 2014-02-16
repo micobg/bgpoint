@@ -21,21 +21,26 @@ ul {
 fieldset {
     border: 0;
 }
-input, button {
+input {
     border: 1px solid #ccc;
     padding: 5px;
 }
-button {
+input[type="submit"] {
     cursor: pointer;
-}
-button:hover {
-    border: 1px solid orange;
 }
 a {
   color: #999;
   font-weight: normal;
   text-decoration: none;
   color: inherit;
+}
+#copyrights {
+    z-index: 10;
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    font-size: 12px;
+    text-shadow: 1px 1px #fff;
 }
 
 /* login */
@@ -61,6 +66,7 @@ a {
 #register-link {
     margin-left: 10px;
 }
+
 
 /* index */
 #menu-box {
@@ -126,17 +132,60 @@ a {
 #all-objects li:hover {
     background-color: #f9f9f9;
 }
-#all-objects li #delete-object-submit {
+#all-objects li#box-header {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #F9F9F9;
+    font-weight: bold;
+    text-align: center;
+    cursor: auto;
+}
+#all-objects li#box-header .object-type-name {
+    color: #3399FF;
+}
+#all-objects li#box-footer {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid #F9F9F9;
+    font-size: 15px;
+    text-align: center;
+}
+#all-objects li#box-header:hover, #all-objects li#box-footer:hover {
+    background-color: #fff;
+}
+#all-objects li#box-footer:hover {
+    text-decoration: underline;
+}
+#all-objects li#box-header #box-close-btn {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    opacity: 0.25;
+    cursor: pointer;
+}
+#all-objects li#box-header #box-close-btn:hover {
+    opacity: 1;
+}
+#all-objects li .delete-object-submit {
     float: right;
     font-size: 12px;
     color: #FF9900;
 }
-#all-objects li #delete-object-submit:hover {
+#all-objects li .delete-object-submit:hover {
     text-decoration: underline;
 }
-#create-object input {
+#create-object input[type="text"] {
     width: 275px;
 }
 #create-object input[required] {
     border-color: orange;
+}
+
+/* map */
+.object-type {
+    cursor: pointer;
+}
+.object-type:hover {
+    text-decoration: underline;
+    color: #3399FF;
 }

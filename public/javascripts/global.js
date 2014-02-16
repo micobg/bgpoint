@@ -22,7 +22,10 @@ function editTemplate() {
 function clearBoxes() {
     hideMessageBox();
 
+    $('#all-objects').remove();
     $('#create-object').remove();
+
+    // TODO: unbind map events
 }
 
 function loginSubmit() {
@@ -44,46 +47,64 @@ function loginSubmit() {
     });
 };
 
-function showAllObjects() {
-    $.getJSON('/objects', function (data) {
-        if (data.objects === 0) {
-            // no data
-            $('body').append('<div id="all-objects">Няма обекти</div>');
-        } else {
-            if ($('#all-objects').length === 0) {
-                // render data
-                $('body').append('<ul id="all-objects"></ul>');
-                data.objects.forEach(function (object) {
-                    $('#all-objects').append('<li data-latitude="' + object.coordinates.latitude + '" data-longitude="' + object.coordinates.longitude + '">' + object.name + ' <span data-object-id="' + object._id + '" id="delete-object-submit">изтрии</span></li>');
-                });
+function renderObjects(data) {
+    clearBoxes();
 
-                if (data.next_page) {
-                    $('#all-objects').append('<li>Виж следващите 10!</li>');
-                }
-            } else {
-                // close it
-                $('#all-objects').remove();
-            }
+    $('body').append('<ul id="all-objects"></ul>');
+    
+    var box = $('#all-objects'),
+        title = (data.filter_by_type === false) ? 'Всички обекти' : 'Обектите от тип <span class="object-type-name">' + data.filter_by_type + '</span>';
+    
+    box.append('<li id="box-header">' + title + ' <img src="/images/close-btn.png" id="box-close-btn" alt="" /></li>');
+    if (data.objects === 0) {
+        // no data
+        box.append('<li>Няма обекти</li>');
+    } else {
+        // render data
+        data.objects.forEach(function (object) {
+            box.append('<li data-object-id="' + object._id + '" data-latitude="' + object.coordinates.latitude + '" data-longitude="' + object.coordinates.longitude + '">' + object.name + ' <span class="delete-object-submit">изтрии</span></li>');
+        });
 
-            // bind event
-            $('#delete-object-submit').on('click', deleteObject);
-            $('#all-objects li').on('click', goToObject);
+        if (data.next_page) {
+            box.append('<li id="box-footer">Покажи още обекти!</li>');
         }
+
+        // bind event
+        $('#box-close-btn').on('click', function () {
+            $('#all-objects').remove();
+        });
+        $('#all-objects li:not(#box-header,#box-footer)').on('click', goToObject);
+        $('.delete-object-submit').on('click', deleteObject);
+    }
+}
+
+function showAllObjects() {
+    // if ($('#all-objects').length !== 0) {
+    //     $('#all-objects').remove();
+    //     return ;
+    // }
+
+    $.getJSON('/objects/10', function (data) {
+        renderObjects(data);
     });
 }
 
 function goToObject(event) {
-    mapInitialize({
-        center: {
-            latitude: $(event.target).data('latitude'),
-            longitude: $(event.target).data('longitude')
-        },
-        zoom: 10
-    });
+    map.panTo(new google.maps.LatLng($(event.target).data('latitude'), $(event.target).data('longitude')));
+    map.setZoom(10);
+    // mapInitialize({
+    //     center: {
+    //         latitude: $(event.target).data('latitude'),
+    //         longitude: $(event.target).data('longitude')
+    //     },
+    //     zoom: 10
+    // });
 }
 
 // on click add-object button
 function addObject() {
+    clearBoxes();
+
     showMessageBox('Кликнете на желанато от Вас място на картата, за да създадете обект!');
     addCreateListener();
 }
@@ -91,7 +112,7 @@ function addObject() {
 function showMessageBox(message) {
     var message_box = $('#message-box');
 
-    message_box.empty().append('Кликнете на желанато от Вас място на картата, за да създадете обект!');
+    message_box.empty().append(message);
     message_box.animate({
         top: 48
     }, 500);
@@ -106,8 +127,10 @@ function hideMessageBox() {
 }
 
 function renderCreateObjectForm(coordinates) {
+    clearBoxes();
+
     $('#create-object').remove();
-    $('body').append('<div id="create-object"></div>');
+    $('body').append('<form id="create-object"></form>');
     var form = $('#create-object');
     form.append('<h2>Добавяне на обект</h2>');
     form.append('<input type="text" id="object-name" required placeholder="Име">');
@@ -119,7 +142,7 @@ function renderCreateObjectForm(coordinates) {
     form.append('<input type="text" id="object-bussines-hours-to" placeholder="Работно време до...">');
     form.append('<input type="text" id="object-price" placeholder="Цена на билета">');
     form.append('<input type="text" id="object-additional-info" placeholder="Допълнителна информация (разделени със запетаи)">');
-    form.append('<br /><button id="create-object-submit">Добави обекта</button>');
+    form.append('<br /><input type="submit" id="create-object-submit" value="Добави обекта" />');
 
     // bind event
     $('#create-object-submit').on('click', createObject);
@@ -177,29 +200,33 @@ function createObject() {
 }
 
 function deleteObject(event) {
+    event.stopPropagation();
+
     var confirmation = confirm('Наистина ли искате да изтриете този обект?');
-console.log(event);
+
     // Check and make sure the user confirmed
     if (confirmation) {
-
-        // If they did, do our delete
+        console.log('successful');
         $.ajax({
             type: 'DELETE',
-            url: '/objects/' + $(event).attr('rel')
+            url: '/objects/' + $(event.target).parent().data('object-id')
         }).done(function (response) {
+            if (response.msg !== '') {
+                alert('Изтриването е нуспешно');
+            }
 
-          // Check for a successful (blank) response
-          if (response.msg === '') {
-          }
-          else {
-            alert('Error: ' + response.msg);
-          }
-
-          showAllObjects();
+            showAllObjects();
         });
-
     }
     else {
         return false;
     }
+}
+
+function showSpecificTypeObjects(event) {
+    var type = $(event.target).html();
+
+    $.getJSON('/objects/' + type + '/10', function (data) {
+        renderObjects(data);
+    });
 }

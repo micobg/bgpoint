@@ -9,7 +9,9 @@ var user = require('./routes/user');
 var objects = require('./routes/objects');
 var http = require('http');
 var path = require('path');
+var querystring = require('querystring');
 // var _ = require('underscore');
+var ObjectID = require('mongodb').ObjectID;
 
 // Database
 var mongo = require('mongoskin');
@@ -20,7 +22,6 @@ var db = mongo.db([
         safe: true
     }
 );
-var ObjectID = require('mongodb').ObjectID
 
 var app = express();
 
@@ -48,14 +49,15 @@ app.get('/', routes.root);
 app.get('/index', checkAuth, routes.index);
 app.get('/login', user.login);
 app.get('/logout', user.logout);
-app.get('/objects', checkAuth, objects.fetch(db));
+app.get('/objects/:limit', checkAuth, objects.fetch(db));
+app.get('/objects/:type/:limit', checkAuth, objects.fetch(db));
 
 // POST
 app.post('/login_submit', user.login_submit(db));
 app.post('/objects', checkAuth, objects.create(db)); // create object
 
 // DELETE
-app.delete('/objects/:id', checkAdmin, objects.delete(db)); // delete object
+app.delete('/objects/:id', checkAdmin, objects.delete(db, ObjectID)); // delete object
 
 
 // server

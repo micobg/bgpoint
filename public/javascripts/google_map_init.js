@@ -1,37 +1,49 @@
 function mapInitialize(givenOptions) {
-    if (typeof givenOptions !== 'undefined') {
-        var center = (typeof givenOptions.center.latitude !== 'undefined' && typeof givenOptions.center.longitude !== 'undefined') ?
-                    new google.maps.LatLng(givenOptions.center.latitude, givenOptions.center.longitude) : 
-                    new google.maps.LatLng(42.733883, 25.485830), // center of Bulgaria
-            mapOptions = {
-                center: center,
-                zoom: (typeof givenOptions.zoom !== 'undefined') ? givenOptions.zoom : 8
-            };
-    } else {
+    // if (typeof givenOptions !== 'undefined') {
+    //     var center = (typeof givenOptions.center.latitude !== 'undefined' && typeof givenOptions.center.longitude !== 'undefined') ?
+    //                 new google.maps.LatLng(givenOptions.center.latitude, givenOptions.center.longitude) : 
+    //                 new google.maps.LatLng(42.733883, 25.485830), // center of Bulgaria
+    //         mapOptions = {
+    //             center: center,
+    //             zoom: (typeof givenOptions.zoom !== 'undefined') ? givenOptions.zoom : 8
+    //         };
+    // } else {
         var mapOptions = {
-                center: new google.maps.LatLng(42.733883, 25.485830),
+                center: new google.maps.LatLng(42.733883, 25.485830), // center of Bulgaria
                 zoom: 8
             };
-    }
+    // }
 
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
     // add markers
-    $.getJSON('/objects', function (data) {
+    $.getJSON('/objects/0', function (data) {
         if (data.objects !== 0) {
             data.objects.forEach(function (object) {
                 var infowindow = new google.maps.InfoWindow({
                     content: renderTooltip(object)
                 });
+                
                 var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(object.coordinates.latitude, object.coordinates.longitude),
-                    title: object.name
-                });
+                        position: new google.maps.LatLng(object.coordinates.latitude, object.coordinates.longitude),
+                        title: object.name
+                    });
+                marker.setMap(map);
+
+                // marker's event listener
                 google.maps.event.addListener(marker, 'click', function() {
                     infowindow.open(map,marker);
                 });
 
-                marker.setMap(map);
+                // info window's event listener
+                google.maps.event.addListener(infowindow, 'domready', function() {
+                    // type click event
+                    $('.object-type').on('click', function(event) {
+                        event.stopPropagation();
+                        
+                        showSpecificTypeObjects(event);
+                    });
+                });
             });
         }
     });    
@@ -40,9 +52,9 @@ function mapInitialize(givenOptions) {
 function addCreateListener() {
     // add event listener
     google.maps.event.addListenerOnce(map, 'click', function(e) {
-        var confirmation = confirm('Искате ли да добавите обект на това място?');
+        // var confirmation = confirm('Искате ли да добавите обект на това място?');
 
-        if (confirmation) {
+        // if (confirmation) {
             var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(e.latLng.d, e.latLng.e),
                 title: 'Нов обект',
@@ -51,14 +63,14 @@ function addCreateListener() {
             marker.setMap(map);
 
             renderCreateObjectForm(e.latLng);
-        }
+        // }
 
         hideMessageBox();
     });
 }
 
 function renderTooltip(object) {
-    var type = '<div> - обектът е от тип <strong>' + object.type + '</strong></div>',
+    var type = '<div> - обектът е от тип <strong class="object-type" data-id="' + object['_id'] + '">' + object.type + '</strong></div>',
         bussines_hours = price = a_info = '';
     
     if (typeof object.bussines_hours !== 'undefined') {
