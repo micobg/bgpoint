@@ -6,7 +6,7 @@ $(window).resize(editTemplate());
 
 // events
 $('#btnLogin').on('click', loginSubmit);
-$('#menu-box #get-all-objects').on('click', fetchAllObjects);
+$('#menu-box #get-all-objects').on('click', showAllObjects);
 $('#menu-box #add-object').on('click', addObject);
 
 function editTemplate() {
@@ -21,6 +21,7 @@ function editTemplate() {
 
 function clearBoxes() {
     hideMessageBox();
+
     $('#create-object').remove();
 }
 
@@ -43,7 +44,7 @@ function loginSubmit() {
     });
 };
 
-function fetchAllObjects() {
+function showAllObjects() {
     $.getJSON('/objects', function (data) {
         if (data.objects === 0) {
             // no data
@@ -53,7 +54,7 @@ function fetchAllObjects() {
                 // render data
                 $('body').append('<ul id="all-objects"></ul>');
                 data.objects.forEach(function (object) {
-                    $('#all-objects').append('<li>' + object.name + ' <span rel="' + object._id + '" id="delete-object-submit">х</span></li>');
+                    $('#all-objects').append('<li data-latitude="' + object.coordinates.latitude + '" data-longitude="' + object.coordinates.longitude + '">' + object.name + ' <span data-object-id="' + object._id + '" id="delete-object-submit">изтрии</span></li>');
                 });
 
                 if (data.next_page) {
@@ -66,7 +67,18 @@ function fetchAllObjects() {
 
             // bind event
             $('#delete-object-submit').on('click', deleteObject);
+            $('#all-objects li').on('click', goToObject);
         }
+    });
+}
+
+function goToObject(event) {
+    mapInitialize({
+        center: {
+            latitude: $(event.target).data('latitude'),
+            longitude: $(event.target).data('longitude')
+        },
+        zoom: 10
     });
 }
 
@@ -183,7 +195,7 @@ console.log(event);
             alert('Error: ' + response.msg);
           }
 
-          fetchAllObjects();
+          showAllObjects();
         });
 
     }

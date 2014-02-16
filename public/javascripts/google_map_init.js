@@ -1,8 +1,18 @@
-function initialize() {
-    var mapOptions = {
-        center: new google.maps.LatLng(42.733883, 25.485830),
-        zoom: 8
-    };
+function mapInitialize(givenOptions) {
+    if (typeof givenOptions !== 'undefined') {
+        var center = (typeof givenOptions.center.latitude !== 'undefined' && typeof givenOptions.center.longitude !== 'undefined') ?
+                    new google.maps.LatLng(givenOptions.center.latitude, givenOptions.center.longitude) : 
+                    new google.maps.LatLng(42.733883, 25.485830), // center of Bulgaria
+            mapOptions = {
+                center: center,
+                zoom: (typeof givenOptions.zoom !== 'undefined') ? givenOptions.zoom : 8
+            };
+    } else {
+        var mapOptions = {
+                center: new google.maps.LatLng(42.733883, 25.485830),
+                zoom: 8
+            };
+    }
 
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
@@ -70,7 +80,7 @@ function renderTooltip(object) {
 function loadScript() {
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize';
+    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=mapInitialize';
     document.body.appendChild(script);
 }
 
