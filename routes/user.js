@@ -4,8 +4,7 @@
  */
 
 exports.login = function(req, res){
-  // res.send("respond with a resource");
-  res.render('login', { title: 'Express' });
+  res.render('login', {});
 };
 
 exports.login_submit = function(db) {
@@ -17,7 +16,9 @@ exports.login_submit = function(db) {
 
 		db.collection('users').find(query, {}).toArray(function (err, items) {
 			if (items.length) { // login successful
-				req.session.user_id = items[0]['_id']; // it's bad but times up
+				// auth data
+				req.session.user_id = items[0]['_id'];
+				
  				res.send({ redirect: 'index' });
 			} else {
 				res.send(false);

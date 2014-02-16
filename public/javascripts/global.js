@@ -7,6 +7,7 @@ $(window).resize(editTemplate());
 // events
 $('#btnLogin').on('click', loginSubmit);
 $('#menu-box #get-all-objects').on('click', fetchAllObjects);
+$('#menu-box #add-object').on('click', addObject);
 
 function editTemplate() {
     // login
@@ -15,6 +16,12 @@ function editTemplate() {
 
     // index
     $('#menu-box').width(window.innerWidth - 275);
+    $('#message-box').width(window.innerWidth - 265);
+}
+
+function clearBoxes() {
+    hideMessageBox();
+    $('#create-object').remove();
 }
 
 function loginSubmit() {
@@ -63,24 +70,48 @@ function fetchAllObjects() {
     });
 }
 
+// on click add-object button
+function addObject() {
+    showMessageBox('Кликнете на желанато от Вас място на картата, за да създадете обект!');
+    addCreateListener();
+}
+
+function showMessageBox(message) {
+    var message_box = $('#message-box');
+
+    message_box.empty().append('Кликнете на желанато от Вас място на картата, за да създадете обект!');
+    message_box.animate({
+        top: 48
+    }, 500);
+}
+
+function hideMessageBox() {
+    var message_box = $('#message-box');
+
+    message_box.animate({
+        top: 20
+    }, 500);
+}
+
 function renderCreateObjectForm(coordinates) {
     $('#create-object').remove();
     $('body').append('<div id="create-object"></div>');
     var form = $('#create-object');
-    form.append('<h2>Създаване на обект</h2>');
-    form.append('<input type="text" id="object-name" placeholder="Име">');
+    form.append('<h2>Добавяне на обект</h2>');
+    form.append('<input type="text" id="object-name" required placeholder="Име">');
     form.append('<input type="hidden" id="object-coordinates-latitude" value="' + coordinates.d + '">');
     form.append('<input type="hidden" id="object-coordinates-longitude" value="' + coordinates.e + '">');
-    form.append('<input type="text" id="object-type" placeholder="Тип">');
-    form.append('<input type="text" id="object-desc" placeholder="Описание">');
+    form.append('<input type="text" id="object-type" required placeholder="Тип">');
+    form.append('<input type="text" id="object-desc" required placeholder="Описание">');
     form.append('<input type="text" id="object-bussines-hours-from" placeholder="Работно време от...">');
     form.append('<input type="text" id="object-bussines-hours-to" placeholder="Работно време до...">');
     form.append('<input type="text" id="object-price" placeholder="Цена на билета">');
     form.append('<input type="text" id="object-additional-info" placeholder="Допълнителна информация (разделени със запетаи)">');
-    form.append('<br /><button id="create-object-submit">Създай обекта</button>');
+    form.append('<br /><button id="create-object-submit">Добави обекта</button>');
 
     // bind event
-    $('#create-object-submit').on('click', createObject);}
+    $('#create-object-submit').on('click', createObject);
+}
 
 function createObject() {
     var object = {
@@ -117,7 +148,17 @@ function createObject() {
         url: '/objects',
         dataType: 'JSON',
         success: function (response) {
+            // remove create tooltip
             $('#create-object').remove();
+
+            // create marker
+            var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(object.coordinates.latitude, object.coordinates.longitude),
+                title: object.name
+            });
+            marker.setMap(map);
+
             alert('Обектът е създаден успешно!');
         }
     });

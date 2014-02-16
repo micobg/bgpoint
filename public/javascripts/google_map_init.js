@@ -4,7 +4,7 @@ function initialize() {
         zoom: 8
     };
 
-    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
     // add markers
     $.getJSON('/objects', function (data) {
@@ -24,10 +24,12 @@ function initialize() {
                 marker.setMap(map);
             });
         }
-    });
+    });    
+}
 
-    // add event listeners
-    google.maps.event.addListener(map, 'click', function(e) {
+function addCreateListener() {
+    // add event listener
+    google.maps.event.addListenerOnce(map, 'click', function(e) {
         var confirmation = confirm('Искате ли да добавите обект на това място?');
 
         if (confirmation) {
@@ -36,13 +38,14 @@ function initialize() {
                 title: 'Нов обект',
                 animation: google.maps.Animation.BOUNCE
             });
-
             marker.setMap(map);
+
             renderCreateObjectForm(e.latLng);
         }
+
+        hideMessageBox();
     });
 }
-
 
 function renderTooltip(object) {
     var type = '<div> - обектът е от тип <strong>' + object.type + '</strong></div>',

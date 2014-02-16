@@ -7,7 +7,6 @@ block content
         h1 Вход 
         #login-form
             fieldset
-                input#inputEmail(type='text', placeholder='Имейл')
-                input#inputPassword(type='password', placeholder='Парола')
+                input#inputEmail(type='text', name="email", placeholder='Имейл')
+                input#inputPassword(type='password', name="password", placeholder='Парола')
                 button#btnLogin Вход
-                a(href='/register')#register-link Регистрация

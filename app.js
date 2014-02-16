@@ -20,6 +20,7 @@ var db = mongo.db([
         safe: true
     }
 );
+var ObjectID = require('mongodb').ObjectID
 
 var app = express();
 
@@ -45,27 +46,44 @@ if ('development' == app.get('env')) {
 // GET
 app.get('/', routes.root);
 app.get('/index', checkAuth, routes.index);
-// app.get('/users', user.list);
 app.get('/login', user.login);
 app.get('/logout', user.logout);
 app.get('/objects', checkAuth, objects.fetch(db));
 
 // POST
 app.post('/login_submit', user.login_submit(db));
-app.post('/objects', checkAuth, objects.create(db));
+app.post('/objects', checkAuth, objects.create(db)); // create object
 
 // DELETE
-app.delete('/objects/:id', checkAuth, objects.delete(db));
+app.delete('/objects/:id', checkAdmin, objects.delete(db)); // delete object
 
+
+// server
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
 
-// other functions
+// is user logged
 function checkAuth(req, res, next) {
 	if (!req.session.user_id) {
 		res.redirect('login');
 	} else {
 		next();
+	}
+}
+
+// is user admin
+function checkAdmin(req, res, next) {
+	if (!req.session.user_id) { // isn't login
+		res.redirect('login');
+	} else {
+		// get user data
+		db.collection('users').find({ '_id': new ObjectID(req.session.user_id) }, {}).toArray(function (err, items) {
+			if (items[0].role === 'admin') {
+				next();
+			} else {
+				// nothing?
+			}
+		});
 	}
 }
