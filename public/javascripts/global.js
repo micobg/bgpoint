@@ -53,7 +53,8 @@ function renderObjects(data) {
     $('body').append('<ul id="all-objects"></ul>');
     
     var box = $('#all-objects'),
-        title = (data.filter_by_type === false) ? 'Всички обекти' : 'Обектите от тип <span class="object-type-name">' + data.filter_by_type + '</span>';
+        title = (data.closest) ? 'Най-близките обекти' :
+            (!data.filter_by_type) ? 'Всички обекти' : 'Обектите от тип <span class="object-type-name">' + data.filter_by_type + '</span>';
     
     box.append('<li id="box-header">' + title + ' <img src="/images/close-btn.png" id="box-close-btn" alt="" /></li>');
     if (data.objects === 0) {
@@ -217,6 +218,7 @@ function deleteObject(event) {
             }
 
             showAllObjects();
+            mapInitialize();
         });
     }
     else {
@@ -228,6 +230,29 @@ function showSpecificTypeObjects(event) {
     var type = $(event.target).html();
 
     $.getJSON('/objects/' + type + '/10', function (data) {
+        renderObjects(data);
+    });
+}
+
+// function objectLike(event) {
+//     var id = $(event.target).data('id'),
+//         rating = parseInt($(event.target).parent().find('em').html().slice(1, -1), 10); // remove '(' and ')'
+
+//     $.ajax({
+//         type: 'PUT',
+//         url: '/objects/like/' + id,
+//         dataType: 'JSON',
+//         success: function (response) {
+//             $(event.target).html(response);
+//         }
+//     });
+// }
+
+function getClosestObjects(event) {
+    var id = $(event.target).data('id');
+
+    $.getJSON('/objects/closest/' + id, function (data) {
+        data.closest = true;
         renderObjects(data);
     });
 }

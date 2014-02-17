@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+    app.use(express.errorHandler());
 }
 
 // GET
@@ -49,12 +49,17 @@ app.get('/', routes.root);
 app.get('/index', checkAuth, routes.index);
 app.get('/login', user.login);
 app.get('/logout', user.logout);
-app.get('/objects/:limit', checkAuth, objects.fetch(db));
+app.get('/objects/closest/:id', objects.closest(db, ObjectID));
 app.get('/objects/:type/:limit', checkAuth, objects.fetch(db));
+app.get('/objects/:limit', checkAuth, objects.fetch(db));
 
 // POST
 app.post('/login_submit', user.login_submit(db));
-app.post('/objects', checkAuth, objects.create(db)); // create object
+app.post('/objects', checkAdmin, objects.create(db)); // create object
+
+// PUT
+// app.put('/objects/like/:id', checkAuth, objects.like(db, ObjectID)); // create object
+// app.put('/objects/unlike/:id', checkAuth, objects.unlike(db)); // create object
 
 // DELETE
 app.delete('/objects/:id', checkAdmin, objects.delete(db, ObjectID)); // delete object

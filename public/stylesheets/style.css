@@ -189,3 +189,9 @@ a {
     text-decoration: underline;
     color: #3399FF;
 }
+.object-like-submit, .get-closest-objects {
+    color: #3399FF;
+}
+.object-like-submit:hover, .get-closest-objects:hover {
+    text-decoration: underline;
+}

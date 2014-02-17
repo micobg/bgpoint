@@ -43,6 +43,20 @@ function mapInitialize(givenOptions) {
                         
                         showSpecificTypeObjects(event);
                     });
+
+                    // // like click event
+                    // $('.object-like-submit').on('click', function(event) {
+                    //     event.stopPropagation();
+                        
+                    //     objectLike(event);
+                    // });
+
+                    // closest click event
+                    $('.get-closest-objects').on('click', function(event) {
+                        event.stopPropagation();
+                        
+                        getClosestObjects(event);
+                    });
                 });
             });
         }
@@ -84,9 +98,10 @@ function renderTooltip(object) {
     }
 
     return '<h2>' + object.name + '</h2>' +
-        'Рейтинг: <em>(' + object.rating + ')</em>' + 
+        // 'Рейтинг: <em>(' + object.rating + ')</em> <span data-id="' + object['_id'] + '" class="object-like-submit">Добави към любими!</span>' + 
         '<div>' + object.desc + '</div>' + 
-        type + bussines_hours + price + a_info;
+        type + bussines_hours + price + a_info + 
+        '<span data-id="' + object['_id'] + '" class="get-closest-objects">Виж 3-те най-близки обекта!</span>';
 }
 
 function loadScript() {
