@@ -156,6 +156,7 @@ function createObject() {
             longitude: $('#object-coordinates-longitude').val()
         },
         type: $('#object-type').val(),
+        desc: $('#object-desc').val(),
         rating: 0
     };
 
